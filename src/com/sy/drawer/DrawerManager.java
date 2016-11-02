@@ -3,6 +3,8 @@ package com.sy.drawer;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.app.FragmentTransaction;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
@@ -178,6 +180,20 @@ public class DrawerManager
 		mTitle = title;
 	}
 	
+	public void push(Fragment fragment)
+	{
+		FragmentManager fragmentManager = mActivity.getFragmentManager();	
+		FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+		fragmentTransaction.addToBackStack(null);		
+		fragmentTransaction.setCustomAnimations(
+		         R.animator.fragment_slide_left_enter,
+		         R.animator.fragment_slide_left_exit,
+		         R.animator.fragment_slide_right_enter,
+		         R.animator.fragment_slide_right_exit);
+		fragmentTransaction.replace(R.id.content_frame, fragment);
+		fragmentTransaction.commit();
+	}
+	
 	/**
 	 * Fragment that appears in the "content_frame", shows a planet
 	 */
@@ -186,7 +202,7 @@ public class DrawerManager
 
 		public SampleFragment(String title) {
 			// Empty constructor required for fragment subclasses
-			this.mTitle = title;
+			this.mTitle = title;			
 		}
 
 		@Override
@@ -196,7 +212,9 @@ public class DrawerManager
 					container, false);	
 			getActivity().setTitle(this.mTitle);
 			setHasOptionsMenu(true);
-			
+			if (mTitle.equals("other")){
+				rootView.setBackgroundColor(Color.RED);
+			}
 			return rootView;
 		}
 		
@@ -221,6 +239,7 @@ public class DrawerManager
 			{
 				case R.id.action_search:
 					Toast.makeText(this.getActivity(), "Search", Toast.LENGTH_SHORT).show();
+					DrawerManager.getInstance().push(new SampleFragment("other"));
 					return true;
 				
 				default:
